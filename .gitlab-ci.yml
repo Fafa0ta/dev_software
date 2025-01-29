@@ -1,28 +1,33 @@
+image: docker:latest
+
+services:
+  - docker:dind
+
+variables:
+  DOCKER_DRIVER: overlay2
+  IMAGE_NAME: "fafa0ta/gym_website"  # یوزرنیم خودت رو جایگزین کن
+
 stages:
   - build
   - deploy
   - test
 
-variables:
-  DOCKER_DRIVER: overlay2
-
-before_script:
-  - docker info
-
 build:
   stage: build
   script:
-    - docker build -t $DOCKER_HUB_USERNAME/gym_website .
-    - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
-    - docker push $DOCKER_HUB_USERNAME/gym_website
+    - echo "Building Docker image..."
+    - docker build -t $IMAGE_NAME .
+    - docker login -u "$DOCKER_HUB_USERNAME" -p "$DOCKER_HUB_PASSWORD"
+    - docker push $IMAGE_NAME
 
 deploy:
   stage: deploy
   script:
-    - echo "Deploy step"
+    - echo "Deploying application..."
+    # اینجا می‌تونی کامندهای مربوط به دیپلوی رو اضافه کنی
 
 test:
   stage: test
   script:
-    - echo "Test step"
-
+    - echo "Running tests..."
+    - docker run --rm $IMAGE_NAME echo "Container is running correctly!"
